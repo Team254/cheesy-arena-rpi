@@ -12,4 +12,5 @@
 *.out
 
 .idea
+*.log
 display_id

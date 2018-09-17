@@ -7,9 +7,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"regexp"
 	"runtime"
@@ -18,13 +20,21 @@ import (
 
 const (
 	displayIdFilePath = "display_id"
-	localServerUrl    = "http://localhost:8080/display?displayId="
+	localServerUrl    = "http://10.0.100.5:8080/display?displayId="
 	remoteServerUrl   = "https://cheesyarena.com/display?displayId="
+	httpTimeout       = 5 * time.Second
 	pollPeriod        = 5 * time.Second
 )
 
 // Main entry point for the application.
 func main() {
+	// Log both to file and to stdout.
+	logFile, err := os.OpenFile("cheesy-arena-rpi.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
+
 	var displayId, serverUrl string
 	for {
 		// Loop until either the local or remote path to the Cheesy Arena server works.
@@ -57,7 +67,8 @@ func main() {
 		browserCommand = exec.Command("open", "-a", "Google Chrome", "--args", "--start-fullscreen",
 			fmt.Sprintf("--app=%s%s", serverUrl, displayId))
 	case "linux":
-		browserCommand = exec.Command("chromium-browser", "--start-fullscreen", "--app", serverUrl+displayId)
+		browserCommand = exec.Command("chromium-browser", "--start-fullscreen",
+			fmt.Sprintf("--app=%s%s", serverUrl, displayId))
 	default:
 		log.Fatalf("Don't know how to launch browser for unsupported operating system '%s'.", runtime.GOOS)
 	}
@@ -73,6 +84,7 @@ func main() {
 func tryGetDisplayId(url string) string {
 	log.Printf("Checking %s for a connection to the Cheesy Arena server.", url)
 	httpClient := &http.Client{
+		Timeout: httpTimeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
