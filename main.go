@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	displayIdFilePath = "display_id"
+	displayIdFilePath = "/boot/display_id"
 	localServerUrl    = "http://10.0.100.5:8080/display?displayId="
 	remoteServerUrl   = "https://cheesyarena.com/display?displayId="
 	httpTimeout       = 5 * time.Second
@@ -56,8 +56,6 @@ func main() {
 		displayId = string(displayIdBytes)
 		log.Printf("Using existing stored display ID %s.", displayId)
 	} else {
-		// Store the new display ID to file.
-		ioutil.WriteFile(displayIdFilePath, []byte(displayId), 0644)
 		log.Printf("Using new display ID %s.", displayId)
 	}
 
