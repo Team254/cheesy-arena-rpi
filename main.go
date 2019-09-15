@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -53,10 +54,10 @@ func main() {
 
 	// Try to read the stored display ID if it exists.
 	if displayIdBytes, _ := ioutil.ReadFile(displayIdFilePath); len(displayIdBytes) > 0 {
-		displayId = string(displayIdBytes)
-		log.Printf("Using existing stored display ID %s.", displayId)
+		displayId = strings.TrimSpace(string(displayIdBytes))
+		log.Printf("Using existing stored display ID '%s'.", displayId)
 	} else {
-		log.Printf("Using new display ID %s.", displayId)
+		log.Printf("Using new display ID '%s'.", displayId)
 	}
 
 	var browserCommand *exec.Cmd
@@ -100,7 +101,7 @@ func tryGetDisplayId(url string) string {
 	if response.StatusCode == 302 {
 		displayIdRe := regexp.MustCompile("displayId=(\\d+)")
 		if matches := displayIdRe.FindStringSubmatch(response.Header.Get("Location")); len(matches) > 0 {
-			log.Printf("Successfully connected to %s with suggested display ID %s.", url, matches[1])
+			log.Printf("Successfully connected to %s with suggested display ID '%s'.", url, matches[1])
 			return matches[1]
 		}
 	}

@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+cheesy-arena-rpi
 
 # Test binary, build with `go test -c`
 *.test
@@ -13,4 +14,3 @@
 
 .idea
 *.log
-display_id
