@@ -1,0 +1,19 @@
+# Copyright 2019 Team 254. All Rights Reserved.
+# Author: pat@patfairbank.com (Patrick Fairbank)
+#
+# Creates an image of a Raspberry Pi SD card.
+
+set -e
+
+IMAGE_FILE=rpi.img
+
+if [ -z "$1" ]
+then
+    echo "Usage: read-image DEVICE_NAME"
+    echo "Example: read-image disk3"
+    exit 1
+fi
+
+sudo diskutil unmountDisk $1
+sudo dd if=/dev/r$1 of=$IMAGE_FILE bs=1m
+sudo diskutil eject $1

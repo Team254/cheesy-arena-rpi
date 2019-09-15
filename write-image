@@ -1,0 +1,26 @@
+# Copyright 2019 Team 254. All Rights Reserved.
+# Author: pat@patfairbank.com (Patrick Fairbank)
+#
+# Writes a Raspberry Pi image to an SD card.
+
+set -e
+
+IMAGE_FILE=rpi.img
+
+if [ -z "$1" ] || [ -z "$2" ]
+then
+    echo "Usage: write-image DEVICE_NAME DISPLAY_ID"
+    echo "Example: write-image disk3 P10"
+    exit 1
+fi
+
+if [ ! -f $IMAGE_FILE ]; then
+    echo "Expected image file '$IMAGE_FILE' not found."
+    exit 1
+fi
+
+sudo diskutil unmountDisk $1
+sudo dd if=$IMAGE_FILE of=/dev/r$1 bs=1m
+sleep 10
+echo $2 > /Volumes/boot/display_id
+sudo diskutil eject $1
